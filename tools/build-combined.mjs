@@ -1,10 +1,10 @@
-// Generate client.js (the repo root is the installable bundle) from the two
-// forked factories in src/.
+// Generate client.js (the repo root is the installable bundle) from the forked
+// factories listed in `halves`.
 //
 // Each fork is an independent window.__ModuleLoader__.load({...}) module with its
 // own `module`/`exports`/`css`/`tagId`/`apply`/`inject` declarations. Concatenating
-// them would collide on those names, so each factory body is wrapped in its own
-// closure and the two `apply`s are composed in the outer module.
+// several of them would collide on those names, so each factory body is wrapped in
+// its own closure and their `apply`s are composed in the outer module.
 //
 // Usage: node tools/build-combined.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -26,14 +26,14 @@ function factoryBody(rel) {
   return text.slice(start + FACTORY_OPEN.length, end);
 }
 
+// The approval fork was reverted: the permission panel stays native.
 const halves = [
-  ['approvalHalf', 'src/approval/client.js'],
   ['questionsHalf', 'src/questions/client.js'],
 ];
 
 const out = [
   '// GENERATED FILE — do not edit by hand.',
-  '// Source: src/approval/client.js + src/questions/client.js',
+  `// Source: ${halves.map(([, rel]) => rel).join(' + ')}`,
   '// Regenerate: node tools/build-combined.mjs',
   'window.__ModuleLoader__.load({',
   `\tid: ${JSON.stringify(MODULE_ID)},`,
@@ -48,13 +48,12 @@ for (const [name, rel] of halves) {
 }
 
 out.push(
-  '\t\t// Union of both halves: a missing service keeps the whole module inactive.',
-  '\t\tconst inject = [...new Set([...approvalHalf.inject, ...questionsHalf.inject])];',
+  '\t\t// Union of every half: a missing service keeps the whole module inactive.',
+  `\t\tconst inject = [...new Set([${halves.map(([name]) => `...${name}.inject`).join(', ')}])];`,
   '\t\treturn {',
   '\t\t\tinject,',
   '\t\t\tapply(ctx) {',
-  '\t\t\t\tapprovalHalf.apply(ctx);',
-  '\t\t\t\tquestionsHalf.apply(ctx);',
+  ...halves.map(([name]) => `\t\t\t\t${name}.apply(ctx);`),
   '\t\t\t},',
   '\t\t};',
   '\t}',
@@ -64,4 +63,4 @@ out.push(
 
 const target = resolve(root, 'client.js');
 writeFileSync(target, out.join('\n'), 'utf8');
-console.log(`wrote ${target}`);
+console.log(`wrote ${target} (${halves.length} half/halves)`);

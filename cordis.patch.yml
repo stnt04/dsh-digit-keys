@@ -1,7 +1,5 @@
-# Digit-key approval panel and question card in one bundle.
-# The two shipped rows are disabled and replaced by the composed client module.
-- id: ui-approval
-  disabled: true
+# Digit-key question card: disables the shipped card and mounts the fork.
+# The permission panel (ui-approval) and plan review stay native — do not disable them.
 - id: ui-user-questions
   disabled: true
 - insert:
