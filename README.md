@@ -33,18 +33,19 @@
 
 ## 仓库结构
 
+**仓库根目录本身就是要安装的插件包**（git 安装只认仓库根，子目录包无法直接安装）：
+
 ```
-digit-keys/                 # 唯一需要安装的包（client.js 由脚本生成）
-  package.json
-  cordis.patch.yml          # 禁用两条内置行 + 插入本插件行
-  index.js
-  client.js                 # 生成物，勿手改
+package.json                # dsh.bundle.patch + dsh.client
+cordis.patch.yml            # 禁用两条内置行 + 插入本插件行
+index.js
+client.js                   # 生成物，勿手改
 src/approval/client.js      # fork 自 @deepseek-ai/dsh-client-ui-approval@0.2.0-rc.2
 src/questions/client.js     # fork 自 @deepseek-ai/dsh-client-ui-user-questions@0.2.0-rc.2
-tools/build-combined.mjs    # 由两个 fork 生成 digit-keys/client.js
+tools/build-combined.mjs    # 由两个 fork 生成根目录的 client.js
 ```
 
-`src/` 里是两份 fork 的**源码**（各自是独立的 `window.__ModuleLoader__.load({...})` 模块），不参与安装；`digit-keys/client.js` 是生成物。
+`src/` 与 `tools/` 只用于开发：`src/` 里是两份 fork 的**源码**（各自是独立的 `window.__ModuleLoader__.load({...})` 模块），不参与安装；`client.js` 是生成物。
 
 ## 合并方式
 
@@ -70,11 +71,17 @@ node tools/build-combined.mjs
 
 ## 安装
 
+**从 GitHub 装**（仓库根即包）：
+
 ```
-plugin_manager  action=install_bundle  target=<repo>/digit-keys
+plugin_manager  action=install_bundle  target=github:stnt04/dsh-digit-keys
 ```
 
-或走 Web 插件页按目录安装。安装会写 profile 的 `package.json` / `cordis.patch.yml`，需要一次审批。
+**从本地目录装**：`target` 指向本仓库根目录（含 `package.json` 的那一层）。
+
+或走 Web 插件页按同样目标安装。安装会写 profile 的 `package.json` / `cordis.patch.yml`，需要一次审批。
+
+> ⚠️ 常见坑：git 安装只把**仓库根**当包。若把包放在子目录（例如早期的 `digit-keys/`），pnpm 会按仓库名合成一个没有 `dsh.bundle` 的包，安装会以「这个包没有声明组合包」被拒。同理，本地目录安装必须指向含 `package.json` 的那一层。
 
 > 若你之前装过仓库历史提交 `739cf55` 里的两个独立插件（`approval-keys` / `question-keys`），**先卸载它们**再装本包：否则两条内置行会被重复禁用，且可能出现两个面板同时注册。
 

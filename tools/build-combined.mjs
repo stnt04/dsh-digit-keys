@@ -1,4 +1,5 @@
-// Generate digit-keys/client.js from the two forked factories in src/.
+// Generate client.js (the repo root is the installable bundle) from the two
+// forked factories in src/.
 //
 // Each fork is an independent window.__ModuleLoader__.load({...}) module with its
 // own `module`/`exports`/`css`/`tagId`/`apply`/`inject` declarations. Concatenating
@@ -61,6 +62,6 @@ out.push(
   '',
 );
 
-const target = resolve(root, 'digit-keys/client.js');
+const target = resolve(root, 'client.js');
 writeFileSync(target, out.join('\n'), 'utf8');
 console.log(`wrote ${target}`);
