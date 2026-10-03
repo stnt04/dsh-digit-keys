@@ -87,6 +87,7 @@ window.__ModuleLoader__.load({
 				className: ApprovalPanel_module_css_default.root,
 				ref: rootRef,
 				tabIndex: -1,
+				style: { outline: "none" },
 				"data-approval-key": pending.key,
 				"aria-busy": answered,
 				onKeyDown: keydown,

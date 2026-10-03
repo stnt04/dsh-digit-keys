@@ -93,6 +93,7 @@ window.__ModuleLoader__.load({
 				className: ApprovalPanel_module_css_default.root,
 				ref: rootRef,
 				tabIndex: -1,
+				style: { outline: "none" },
 				"data-approval-key": pending.key,
 				"aria-busy": answered,
 				onKeyDown: keydown,
@@ -1431,6 +1432,7 @@ window.__ModuleLoader__.load({
 				className: QuestionComposer_module_css_default.frame,
 				ref: frameRef,
 				tabIndex: -1,
+				style: { outline: "none" },
 				onKeyDown: cardKeydown,
 				"data-question-key": pending.key,
 				children: (0, react_jsx_runtime.jsxs)("section", {
