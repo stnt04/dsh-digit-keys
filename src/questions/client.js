@@ -531,6 +531,29 @@ window.__ModuleLoader__.load({
 					selected: [label]
 				}] }), pending.snapshot().channel === "rpc");
 			};
+			const frameRef = (0, react.useRef)(null);
+			(0, react.useEffect)(() => {
+				frameRef.current?.focus();
+			}, []);
+			/** Digit keys mirror the two footer actions: 1 approves, 2 requests changes. */
+			const planKeydown = (event) => {
+				const element = event.target;
+				if (event.defaultPrevented || busy) return;
+				if (element.closest("input, textarea, select, [contenteditable=\"true\"], [contenteditable=\"\"]") !== null) return;
+				if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+				if (event.repeat || isComposing(event)) return;
+				if (event.key === "1") {
+					event.preventDefault();
+					event.stopPropagation();
+					decide(review.approve.label);
+					return;
+				}
+				if (event.key === "2") {
+					event.preventDefault();
+					event.stopPropagation();
+					settle(() => pending.dismiss());
+				}
+			};
 			const summary = (0, react.useMemo)(() => {
 				const title = (0, _deepseek_ai_dsh_client_ui_primitives.extractMarkdownPlainText)(review.plan, { mode: "first-line" });
 				const description = (0, _deepseek_ai_dsh_client_ui_primitives.extractMarkdownPlainText)(review.plan, { mode: "first-paragraph" });
@@ -541,6 +564,10 @@ window.__ModuleLoader__.load({
 			}, [review.plan]);
 			return (0, react_jsx_runtime.jsx)("div", {
 				className: PlanReviewPanel_module_css_default.frame,
+				ref: frameRef,
+				tabIndex: -1,
+				style: { outline: "none" },
+				onKeyDown: planKeydown,
 				"data-plan-review-key": pending.key,
 				children: (0, react_jsx_runtime.jsxs)("section", {
 					className: PlanReviewPanel_module_css_default.card,
@@ -587,7 +614,8 @@ window.__ModuleLoader__.load({
 									onClick: () => {
 										settle(() => pending.dismiss());
 									},
-									children: t("plan.discuss")
+									"aria-keyshortcuts": "2",
+									children: "2 " + t("plan.discuss")
 								}), (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Button, {
 									variant: "primary",
 									...tooltip(review.approve.description),
@@ -595,7 +623,8 @@ window.__ModuleLoader__.load({
 									onClick: () => {
 										decide(review.approve.label);
 									},
-									children: t("plan.approve")
+									"aria-keyshortcuts": "1",
+									children: "1 " + t("plan.approve")
 								})]
 							})]
 						})
