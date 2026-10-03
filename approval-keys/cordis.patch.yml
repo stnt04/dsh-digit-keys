@@ -1,0 +1,6 @@
+# Digit-key approval panel: disables the shipped panel and mounts the fork.
+- id: ui-approval
+  disabled: true
+- insert:
+    - id: approval-keys
+      name: '@local/approval-keys'

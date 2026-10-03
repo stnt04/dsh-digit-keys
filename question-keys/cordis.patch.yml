@@ -1,0 +1,6 @@
+# Digit-key question card: disables the shipped card and mounts the fork.
+- id: ui-user-questions
+  disabled: true
+- insert:
+    - id: question-keys
+      name: '@local/question-keys'
