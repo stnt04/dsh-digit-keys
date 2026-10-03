@@ -75,19 +75,17 @@ window.__ModuleLoader__.load({
 					setAnswered(false);
 				});
 			};
+			/** `1` allows, `2` / `Escape` reject. Enter deliberately answers nothing. */
 			const keydown = (event) => {
 				const element = event.target;
 				if (event.defaultPrevented || !event.currentTarget.contains(document.activeElement) || element.closest("input, textarea, select, [contenteditable=\"true\"], [contenteditable=\"\"]") !== null) return;
 				if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
 				const digit = event.key === "1" ? "allowed-once" : event.key === "2" ? "rejected" : void 0;
-				if (digit === void 0) {
-					if (event.key !== "Enter" && event.key !== "Escape") return;
-					if (event.key === "Enter" && element.closest("button, a[href], [role=\"button\"]") !== null) return;
-				}
+				if (digit === void 0 && event.key !== "Escape") return;
 				event.preventDefault();
 				event.stopPropagation();
 				if (event.repeat || composing.current || compositionEnded.current || event.nativeEvent.isComposing || event.keyCode === 229) return;
-				answer(digit ?? (event.key === "Enter" ? "allowed-once" : "rejected"));
+				answer(digit ?? "rejected");
 			};
 			return (0, react_jsx_runtime.jsx)("div", {
 				className: ApprovalPanel_module_css_default.root,
@@ -338,9 +336,9 @@ window.__ModuleLoader__.load({
 				scope.effect(() => scope.shortcuts.registerFixed({
 					id: "approval.allow",
 					label: () => t("allowOnce"),
-					keys: ["Enter"],
+					keys: ["1"],
 					bindings: [{
-						code: "Enter",
+						code: "Digit1",
 						modifiers: []
 					}],
 					group: "approval"
@@ -348,8 +346,11 @@ window.__ModuleLoader__.load({
 				scope.effect(() => scope.shortcuts.registerFixed({
 					id: "approval.reject",
 					label: () => t("reject"),
-					keys: ["Esc"],
+					keys: ["2", "Esc"],
 					bindings: [{
+						code: "Digit2",
+						modifiers: []
+					}, {
 						code: "Escape",
 						modifiers: []
 					}],
@@ -910,29 +911,6 @@ window.__ModuleLoader__.load({
 					selected: [label]
 				}] }), pending.snapshot().channel === "rpc");
 			};
-			const frameRef = (0, react.useRef)(null);
-			(0, react.useEffect)(() => {
-				frameRef.current?.focus();
-			}, []);
-			/** Digit keys mirror the two footer actions: 1 approves, 2 requests changes. */
-			const planKeydown = (event) => {
-				const element = event.target;
-				if (event.defaultPrevented || busy) return;
-				if (element.closest("input, textarea, select, [contenteditable=\"true\"], [contenteditable=\"\"]") !== null) return;
-				if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
-				if (event.repeat || isComposing(event)) return;
-				if (event.key === "1") {
-					event.preventDefault();
-					event.stopPropagation();
-					decide(review.approve.label);
-					return;
-				}
-				if (event.key === "2") {
-					event.preventDefault();
-					event.stopPropagation();
-					settle(() => pending.dismiss());
-				}
-			};
 			const summary = (0, react.useMemo)(() => {
 				const title = (0, _deepseek_ai_dsh_client_ui_primitives.extractMarkdownPlainText)(review.plan, { mode: "first-line" });
 				const description = (0, _deepseek_ai_dsh_client_ui_primitives.extractMarkdownPlainText)(review.plan, { mode: "first-paragraph" });
@@ -943,10 +921,6 @@ window.__ModuleLoader__.load({
 			}, [review.plan]);
 			return (0, react_jsx_runtime.jsx)("div", {
 				className: PlanReviewPanel_module_css_default.frame,
-				ref: frameRef,
-				tabIndex: -1,
-				style: { outline: "none" },
-				onKeyDown: planKeydown,
 				"data-plan-review-key": pending.key,
 				children: (0, react_jsx_runtime.jsxs)("section", {
 					className: PlanReviewPanel_module_css_default.card,
@@ -993,8 +967,7 @@ window.__ModuleLoader__.load({
 									onClick: () => {
 										settle(() => pending.dismiss());
 									},
-									"aria-keyshortcuts": "2",
-									children: "2 " + t("plan.discuss")
+									children: t("plan.discuss")
 								}), (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Button, {
 									variant: "primary",
 									...tooltip(review.approve.description),
@@ -1002,8 +975,7 @@ window.__ModuleLoader__.load({
 									onClick: () => {
 										decide(review.approve.label);
 									},
-									"aria-keyshortcuts": "1",
-									children: "1 " + t("plan.approve")
+									children: t("plan.approve")
 								})]
 							})]
 						})

@@ -18,7 +18,7 @@ const FACTORY_TAIL = '\n\t}\n});';
 
 /** Everything between the factory header and the factory's closing brace. */
 function factoryBody(rel) {
-  const text = readFileSync(resolve(root, rel), 'utf8');
+  const text = readFileSync(resolve(root, rel), 'utf8').replace(/\r\n/g, '\n');
   const start = text.indexOf(FACTORY_OPEN);
   if (start === -1) throw new Error(`factory header not found in ${rel}`);
   const end = text.lastIndexOf(FACTORY_TAIL);
