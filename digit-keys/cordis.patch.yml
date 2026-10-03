@@ -1,0 +1,9 @@
+# Digit-key approval panel and question card in one bundle.
+# The two shipped rows are disabled and replaced by the composed client module.
+- id: ui-approval
+  disabled: true
+- id: ui-user-questions
+  disabled: true
+- insert:
+    - id: digit-keys
+      name: '@local/digit-keys'

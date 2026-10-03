@@ -1,11 +1,14 @@
 {
-  "name": "@local/approval-keys",
+  "name": "@local/digit-keys",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js"
+  },
+  "scripts": {
+    "build": "node tools/build-combined.mjs"
   },
   "dsh": {
     "bundle": { "patch": "./cordis.patch.yml" },
@@ -17,7 +20,8 @@
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-conversation",
         "@deepseek-ai/dsh-client-ui-renderer",
-        "@deepseek-ai/dsh-client-ui-session"
+        "@deepseek-ai/dsh-client-ui-session",
+        "@deepseek-ai/dsh-client-ui-chat"
       ]
     }
   }
